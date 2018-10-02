@@ -63,6 +63,7 @@ app=Flask(__name__)
 
 blockchain = Blockchain()
 
+#Mining new block
 @app.route('/mine_block',methods=['GET'])
 def mine_block():
     previous_block = blockchain.get_last_block()
@@ -73,14 +74,25 @@ def mine_block():
     response = {'message' : 'You just mined the block, your block will add to blockchin',
                 'index' : block['index'], 'timestamp': block['timestamp'],
                 'proof' : block['proof'], 'previous_hash' : block['previous_hash']}
-    
+
     return jsonify(response), 200
 
-
+#Getting full blockchain
 @app.route('/get_chain',methods=['GET'])
 def get_chain():
     chain = blockchain.chain
     length = len(chain)
     response = {'chain': chain, 'length': length}
-    
+
     return jsonify(response),200
+
+@app.route('/is_valid', methods = ['GET'])
+def is_valid():
+    is_valid = blockchain.is_chain_valid(blockchain.chain)
+    if is_valid:
+        response = {'message': 'Blockchain is valid.'}
+    else:
+        response = {'message': 'Blockchain is not valid.'}
+    return jsonify(response), 200
+
+app.run(host = '0.0.0.0', port = 5000)
